@@ -26,6 +26,7 @@ class BootHookPartHandler(handlers.Handler):
         handlers.Handler.__init__(self, PER_ALWAYS)
         self.boothook_dir = paths.get_ipath("boothooks")
         self.instance_id = None
+        self.datasource = datasource
         if datasource:
             self.instance_id = datasource.get_instance_id()
 
@@ -40,6 +41,9 @@ class BootHookPartHandler(handlers.Handler):
 
     def handle_part(self, data, ctype, filename, payload, frequency):
         if ctype in handlers.CONTENT_SIGNALS:
+            return
+        if not self._is_enabled():
+            LOG.debug("Boothook handler is disabled")
             return
 
         filepath = self._write_part(payload, filename)
@@ -57,3 +61,13 @@ class BootHookPartHandler(handlers.Handler):
             util.logexc(
                 LOG, "Boothooks unknown error when running %s", filepath
             )
+
+    def _is_enabled(self):
+        is_enabled = True
+        if self.datasource and hasattr(self.datasource, "sys_cfg"):
+            handler_cfg = self.datasource.sys_cfg.get("handlers", {})
+            if handler_cfg:
+                LOG.debug("Boothook handler config found: %s", handler_cfg)
+                is_enabled = handler_cfg.get("boothook_enabled", True)
+            
+        return is_enabled

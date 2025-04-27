@@ -338,11 +338,21 @@ class Modules:
         skipped = []
         forced = []
         overridden = self.cfg.get("unverified_modules", [])
+        allowlist = self.cfg.get("allowed_modules", None)
+        blocklist = self.cfg.get("blocked_modules", None)
         inapplicable_mods = []
         active_mods = []
         for module_details in mostly_mods:
             (mod, name, _freq, _args) = module_details
             if mod is None:
+                continue
+            if allowlist and name not in allowlist:
+                skipped.append(name)
+                LOG.debug(f"Module '{name}' is not in the allowed module list.")
+                continue
+            if blocklist and name in blocklist:
+                skipped.append(name)
+                LOG.debug(f"Module '{name}' is in the blocked module list.")
                 continue
             worked_distros = mod.meta["distros"]
             if not _is_active(module_details, self.cfg):

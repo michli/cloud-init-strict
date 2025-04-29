@@ -79,3 +79,6 @@ PER_ONCE = "once"
 FREQUENCIES = [PER_INSTANCE, PER_ALWAYS, PER_ONCE]
 
 HOTPLUG_ENABLED_FILE = "/var/lib/cloud/hotplug.enabled"
+
+CFG_MERGE_BASE_FIRST = "cfg-merge-base-first"
+CFG_MERGE_BASE_LAST = "cfg-merge-base-last"

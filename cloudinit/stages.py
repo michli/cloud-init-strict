@@ -47,6 +47,7 @@ from cloudinit.settings import (
     PER_ALWAYS,
     PER_INSTANCE,
     PER_ONCE,
+    CFG_MERGE_BASE_FIRST,
 )
 from cloudinit.sources import NetworkConfigSource
 
@@ -308,6 +309,7 @@ class Init:
             base_cfg=fetch_base_config(
                 no_cfg_paths.run_dir, instance_data_file=instance_data_file
             ),
+            cfg_precedence=CFG_MERGE_BASE_FIRST
         )
         return merger.cfg
 

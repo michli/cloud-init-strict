@@ -301,14 +301,6 @@ class Init:
         instance_data_file = no_cfg_paths.get_runpath(
             "instance_data_sensitive"
         )
-        # Anything in your conf.d or 'default' cloud.cfg location.
-        confd_cfg = util.read_conf_with_confd(
-                CLOUD_CONFIG, instance_data_file=instance_data_file
-            )
-        preserve_base_cfg = util.get_cfg_option_str(
-            confd_cfg, "preserve_base_cfg", False)
-        if preserve_base_cfg:
-            LOG.info("Preserve the base configuration")
         merger = helpers.ConfigMerger(
             paths=no_cfg_paths,
             datasource=self.datasource,
@@ -316,7 +308,6 @@ class Init:
             base_cfg=fetch_base_config(
                 no_cfg_paths.run_dir, instance_data_file=instance_data_file
             ),
-            preserve_base_cfg=preserve_base_cfg
         )
         return merger.cfg
 

@@ -167,7 +167,6 @@ class ConfigMerger:
         additional_fns=None,
         base_cfg=None,
         include_vendor=True,
-        preserve_base_cfg=False,
     ):
         self._paths = paths
         self._ds = datasource
@@ -176,7 +175,6 @@ class ConfigMerger:
         self._include_vendor = include_vendor
         # Created on first use
         self._cfg = None
-        self._preserve_base_cfg = preserve_base_cfg
 
     def _get_datasource_configs(self):
         d_cfgs = []
@@ -255,9 +253,15 @@ class ConfigMerger:
         cfgs.extend(self._get_env_configs())
         cfgs.extend(self._get_instance_configs())
         cfgs.extend(self._get_datasource_configs())
+        preserve_base_cfg = False
         if self._base_cfg:
             cfgs.append(self._base_cfg)
-        return util.mergemanydict(cfgs, self._preserve_base_cfg)
+            preserve_base_cfg = util.get_cfg_option_str(
+                self._base_cfg, "preserve_base_cfg", False)
+            if preserve_base_cfg:
+                LOG.info("Preserve the base configuration")
+                self._base_cfg['merge_how'] = "list(replace)+dict(replace)+str(replace)"
+        return util.mergemanydict(cfgs)
 
     @property
     def cfg(self):

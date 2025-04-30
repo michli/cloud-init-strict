@@ -16,7 +16,7 @@ from io import StringIO
 from time import time
 
 from cloudinit import persistence, settings, type_utils, util
-from cloudinit.settings import CFG_ENV_NAME, PER_ALWAYS, PER_INSTANCE, PER_ONCE, CFG_MERGE_BASE_FIRST, CFG_MERGE_BASE_LAST
+from cloudinit.settings import CFG_ENV_NAME, PER_ALWAYS, PER_INSTANCE, PER_ONCE
 
 LOG = logging.getLogger(__name__)
 
@@ -167,7 +167,7 @@ class ConfigMerger:
         additional_fns=None,
         base_cfg=None,
         include_vendor=True,
-        cfg_precedence=CFG_MERGE_BASE_LAST,
+        preserve_base_cfg=False,
     ):
         self._paths = paths
         self._ds = datasource
@@ -176,7 +176,7 @@ class ConfigMerger:
         self._include_vendor = include_vendor
         # Created on first use
         self._cfg = None
-        self._cfg_precedence = cfg_precedence
+        self._preserve_base_cfg = preserve_base_cfg
 
     def _get_datasource_configs(self):
         d_cfgs = []
@@ -257,7 +257,7 @@ class ConfigMerger:
         cfgs.extend(self._get_datasource_configs())
         if self._base_cfg:
             cfgs.append(self._base_cfg)
-        return util.mergemanydict(cfgs, self._cfg_precedence == CFG_MERGE_BASE_FIRST)
+        return util.mergemanydict(cfgs, self._preserve_base_cfg)
 
     @property
     def cfg(self):

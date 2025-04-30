@@ -119,11 +119,16 @@ class Modules:
     def cfg(self) -> config.Config:
         # None check to avoid empty case causing re-reading
         if self._cached_cfg is None:
+            preserve_base_cfg = util.get_cfg_option_str(
+                self.init.cfg, "preserve_base_cfg", False)
+            if preserve_base_cfg:
+                LOG.info("Preserve the base configuration")
             merger = ConfigMerger(
                 paths=self.init.paths,
                 datasource=self.init.datasource,
                 additional_fns=self.cfg_files,
                 base_cfg=self.init.cfg,
+                preserve_base_cfg=preserve_base_cfg,
             )
             self._cached_cfg = merger.cfg
         # Only give out a copy so that others can't modify this...

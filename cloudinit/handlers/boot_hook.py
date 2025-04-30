@@ -42,7 +42,7 @@ class BootHookPartHandler(handlers.Handler):
     def handle_part(self, data, ctype, filename, payload, frequency):
         if ctype in handlers.CONTENT_SIGNALS:
             return
-        if not self._is_enabled():
+        if self._is_disabled():
             LOG.debug("Boothook handler is disabled")
             return
 
@@ -62,12 +62,9 @@ class BootHookPartHandler(handlers.Handler):
                 LOG, "Boothooks unknown error when running %s", filepath
             )
 
-    def _is_enabled(self):
-        is_enabled = True
+    def _is_disabled(self):
+        disabled = False
         if self.datasource and hasattr(self.datasource, "sys_cfg"):
-            handler_cfg = self.datasource.sys_cfg.get("handlers", {})
-            if handler_cfg:
-                LOG.debug("Boothook handler config found: %s", handler_cfg)
-                is_enabled = handler_cfg.get("boothook_enabled", True)
+            disabled = self.datasource.sys_cfg.get("disable_boothook", False)
             
-        return is_enabled
+        return disabled

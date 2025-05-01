@@ -256,12 +256,21 @@ class ConfigMerger:
         preserve_base_cfg = False
         if self._base_cfg:
             cfgs.append(self._base_cfg)
-            preserve_base_cfg = util.get_cfg_option_str(
-                self._base_cfg, "preserve_base_cfg", False)
-            if preserve_base_cfg:
-                LOG.info("Preserve the base configuration")
-                self._base_cfg['merge_how'] = "list(replace)+dict(replace)+str(replace)"
+            self._preserve_base_cfg()
+    
         return util.mergemanydict(cfgs)
+
+    def _preserve_base_cfg(self):
+        preserve_base_cfg = util.get_cfg_option_str(
+            self._base_cfg, "preserve_base_cfg", False)
+        if not preserve_base_cfg:
+            return
+        
+        LOG.info("Preserve the base configuration")
+        default_merge_type = "list(replace)+dict(replace)+str(replace)"
+        cfg_merge_type =  util.get_cfg_option_str(
+            self._base_cfg, "cfg_merge_type", default_merge_type)
+        self._base_cfg['merge_how'] = cfg_merge_type
 
     @property
     def cfg(self):

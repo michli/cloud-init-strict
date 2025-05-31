@@ -17,6 +17,7 @@ from time import time
 
 from cloudinit import persistence, settings, type_utils, util
 from cloudinit.settings import CFG_ENV_NAME, PER_ALWAYS, PER_INSTANCE, PER_ONCE
+from cloudinit.allow_keys_filter import AllowKeyFilter
 
 LOG = logging.getLogger(__name__)
 
@@ -252,6 +253,9 @@ class ConfigMerger:
 
         cfgs.extend(self._get_env_configs())
         cfgs.extend(self._get_instance_configs())
+        pre_filter_cfg = util.mergemanydict(cfgs)
+        post_filter_cfg = AllowKeyFilter(self._base_cfg).filter(pre_filter_cfg)
+        cfgs = [post_filter_cfg]
         cfgs.extend(self._get_datasource_configs())
         if self._base_cfg:
             cfgs.append(self._base_cfg)
